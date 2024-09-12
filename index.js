@@ -11,6 +11,10 @@ app.use(
     }),
   );
 app.use("/api/users", require("./routes/api/users"));
+app.use((req,res,next)=>{
+  res.header('Access-Control-Allow-Origin',"*");
+  next();
+})
 app.listen(3000, ()=>{
     console.log("Server started listening on port 3000");
 });
