@@ -12,7 +12,7 @@ app.use(
   );
 app.use("/api/users", require("./routes/api/users"));
 app.use((req,res,next)=>{
-  res.header('Access-Control-Allow-Origin',"*");
+  res.header("Access-Control-Allow-origin", "http://localhost:3000");
   next();
 })
 app.listen(3000, ()=>{
