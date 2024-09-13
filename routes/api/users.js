@@ -2,7 +2,7 @@ const express= require("express");
 const router= express.Router();
 let users= require("../../Users");
 const { v4: uuidv4 } = require("uuid");
-router.options("/",  function(req, res, next) {
+router.all("/",  function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     next();
