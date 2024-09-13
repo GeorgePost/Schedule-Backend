@@ -33,7 +33,7 @@ router.post("/",(req,res)=>{
         return res.sendStatus(400);
     }
     users.push(newUser);
-    res.json(users);
+    res.json(newUser);
 })
 router.put("/:email",(req,res)=>{
     const found=users.some((user)=>user.email==String(req.params.email).toLocaleLowerCase());
