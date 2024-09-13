@@ -3,7 +3,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 const cors = require('cors');
 app.use(express.json());
-var allowlist = ['http://localhost:3000/Schedule-FrontEnd', 'https://georgepost.github.io/Schedule-FrontEnd/']
+var allowlist = ['http://localhost:3000', 'https://georgepost.github.io']
 var corsOptionsDelegate = function (req, callback) {
   var corsOptions;
   if (allowlist.indexOf(req.header('Origin')) !== -1) {
