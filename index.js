@@ -1,6 +1,7 @@
 const express= require("express")
 const app = express();
 const port = process.env.PORT || 4000;
+const cors = require('cors');
 app.use(express.json());
 app.use(cors({
   origin: "https://slug-panel.onrender.com",
