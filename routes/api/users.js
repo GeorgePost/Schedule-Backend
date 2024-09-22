@@ -45,7 +45,7 @@ router.put("/:email",(req,res)=>{
                 user.P1=updateUser.P1? updateUser.P1 : user.P1;
                 user.P2=updateUser.P2 ? updateUser.P2 :user.P2;
                 user.P3=updateUser.P3? updateUser.P3 : user.P3;
-                user.P4=updateUser.P4 ? updateUser.P2 :user.P4;
+                user.P4=updateUser.P4 ? updateUser.P4 :user.P4;
                 res.json({msg:"User Found",user})
             }
         });
