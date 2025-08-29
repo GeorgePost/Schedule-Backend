@@ -20,7 +20,7 @@ router.get("/",async (req,res)=>{
 })
 router.get("/:email",async (req,res)=>{
     const db=await getDb();
-    const user=await db.collection('schedule').findOne({email:String(req.body.email).toLocaleLowerCase()})
+    const user=await db.collection('schedule').findOne({email:String(req.params.email).toLocaleLowerCase()})
     if(user){
         res.json(user)
     }else{
