@@ -1,26 +1,39 @@
 const express= require("express");
 const router= express.Router();
-let users= require("../../Users");
-const { v4: uuidv4 } = require("uuid");
+const { getDb } = require('../../db');
+const dotenv = require('dotenv');
+dotenv.config()
 router.all("/",  function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     next();
 });
-router.get("/",(req,res)=>{
-    res.json(users);
+router.get("/",async (req,res)=>{
+    if(req.body.password===process.env.ALLUSERKEY){
+        const db=await getDb();
+        users= await db.collection('schedule').find().toArray()
+        res.json(users);
+    }else{
+        res.status(409)
+    }
+    
 })
-router.get("/:email",(req,res)=>{
-    const found=users.some((user)=>user.email==String(req.params.email).toLocaleLowerCase())
-    if(found){
-        res.json(users.filter(user=>user.email===req.params.email))
+router.get("/:email",async (req,res)=>{
+    const db=await getDb();
+    const user=await db.collection('schedule').findOne({email:String(req.body.email).toLocaleLowerCase()})
+    if(user){
+        res.json(user)
     }else{
         res.sendStatus(404);
     }
 })
-router.post("/",(req,res)=>{
+router.post("/",async (req,res)=>{
+    const db=await getDb();
+    const user=await db.collection('schedule').findOne({email:String(req.body.email).toLocaleLowerCase()})
+    if(user){
+        return res.sendStatus(400);
+    }
     const newUser={
-        id: uuidv4(),
         name:String(req.body.name),
         email:String(req.body.email).toLocaleLowerCase(),
         P1:"P1",
@@ -29,34 +42,48 @@ router.post("/",(req,res)=>{
         P4:"P4",
         admin:false,
     }
-    if(!newUser.name || !newUser.email){
-        return res.sendStatus(400);
-    }
-    users.push(newUser);
-    res.json(newUser);
+    db.collection('schedule').insertOne({
+        name:String(req.body.name),
+        email:String(req.body.email).toLocaleLowerCase(),
+        P1:"P1",
+        P2:"P2",
+        P3:"P3",
+        P4:"P4",
+        admin:false,
+    })
+    res.json(newUser)
 })
-router.put("/:email",(req,res)=>{
-    const found=users.some((user)=>user.email==String(req.params.email).toLocaleLowerCase());
-    if(found){
-        const updateUser= req.body;
-        users.forEach(user=>{
-            if(user.email==String(req.params.email).toLocaleLowerCase()){
-                user.name=updateUser.name ? updateUser.name : user.name;
-                user.P1=updateUser.P1? updateUser.P1 : user.P1;
-                user.P2=updateUser.P2 ? updateUser.P2 :user.P2;
-                user.P3=updateUser.P3? updateUser.P3 : user.P3;
-                user.P4=updateUser.P4 ? updateUser.P4 :user.P4;
-                res.json({msg:"User Found",user})
-            }
-        });
+router.put("/:email",async (req,res)=>{
+    const db=await getDb();
+    const user=await db.collection('schedule').findOne({email:String(req.params.email).toLocaleLowerCase()})
+    if(user){
+        const updates=req.body
+        const updateUser={...user,
+            name:updates.name ? updates.name : user.name,
+            P1:updates.P1? updates.P1 : user.P1,
+            P2:updates.P2 ? updates.P2 :user.P2,
+            P3:updates.P3? updates.P3 : user.P3,
+            P4:updates.P4 ? updates.P4 :user.P4,
+        }
+        await db.collection('schedule').updateOne( { email:String(req.params.email).toLocaleLowerCase() }, 
+        { $set: { 
+            name:updates.name ? updates.name : user.name,
+            P1:updates.P1? updates.P1 : user.P1,
+            P2:updates.P2 ? updates.P2 :user.P2,
+            P3:updates.P3? updates.P3 : user.P3,
+            P4:updates.P4 ? updates.P4 :user.P4,
+        } } )
+        res.json(updateUser)
     }else{
-        res.sendStatus(400);
+        res.sendStatus(404);
     }
+    
 })
-router.delete("/:email",(req,res)=>{
-    const found=users.some((user)=>user.email===String(req.params.email).toLocaleLowerCase());
-    if(found){
-        users=users.filter((user)=>user.email!==String(req.params.email).toLocaleLowerCase());
+router.delete("/:email",async (req,res)=>{
+    const db=await getDb();
+    const user=await db.collection('schedule').findOne({email:String(req.body.email).toLocaleLowerCase()})
+    if(user){
+        db.schedule.deleteOne({email:String(req.body.email).toLocaleLowerCase()})
         res.json({
             msg:"User Deleted",
         })
